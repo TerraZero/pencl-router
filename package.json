@@ -1,0 +1,17 @@
+{
+  "name": "pencl-router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TerraZero",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.14.31",
+    "pencl-base": "git+https://github.com/TerraZero/pencl-base.git",
+    "pencl-config": "git+https://github.com/TerraZero/pencl-config.git",
+    "route-parser": "0.0.5"
+  }
+}
