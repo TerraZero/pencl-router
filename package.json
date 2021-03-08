@@ -10,9 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^14.14.31",
-    "bcryptjs": "^2.4.3",
     "formidable": "^1.2.2",
-    "jsonwebtoken": "^8.5.1",
     "pencl-base": "git+https://github.com/TerraZero/pencl-base.git",
     "pencl-config": "git+https://github.com/TerraZero/pencl-config.git",
     "route-parser": "0.0.5"
