@@ -1,4 +1,5 @@
 const RouteParser = require('route-parser');
+const RouterError = require('../Error/RouterError');
 
 /**
  * @callback checkCallback
@@ -16,7 +17,7 @@ module.exports = class Route {
    * @param {import('../Controller/ControllerBase')} controller 
    * @param {string} name 
    * @param {string} url 
-   * @param {serveCallback[]} serve
+   * @param {(serveCallback[]|string[]|[serveCallback, number][])} serve
    * @param {string} namespace
    */
   constructor(controller, name, url, serve, namespace = null) {
@@ -24,14 +25,25 @@ module.exports = class Route {
     this.name = name;
     this.namespace = namespace;
     this.url = url;
-    this.serve = serve;
+    this._prepared = false;
+    this._serve = serve;
 
     this._checks = [];
     if (this.namespace === null) {
-      this.pattern = new RouteParser(this.url);
+      this.pattern = new RouteParser('/' + this.url);
     } else {
-      this.pattern = new RouteParser(this.namespace + '/' + this.url);
+      this.pattern = new RouteParser('/' + this.namespace + '/' + this.url);
     }
+  }
+
+  /**
+   * @param {(serveCallback|string|[serveCallback, number])} middleware
+   * @returns {this}
+   */
+  addMiddleware(middleware) {
+    if (this._prepared) throw new RouterError('The route is already prepared it can not add a middleware.');
+    this._serve.push(middleware);
+    return this;
   }
 
   /**
@@ -67,16 +79,31 @@ module.exports = class Route {
   }
 
   /**
+   * @param {import('../Manager/RouterManager')} router
    * @param {import('../Request/Serve')} serve 
    * 
    * @returns {import('../Request/Serve')}
    */
-  async serve(serve) {
+  async serve(router, serve) {
     try {
+      if (!this._prepared) {
+        serve = await router.prepareMiddlewares(serve, this);
+        this._prepared = true;
+      }
       await this.controller.onPrepare(serve, this);
-      return await this.serve.call(this.controller, serve);
+      for (const func of this._serve) {
+        serve.metaMiddleware(func.name);
+        serve = await func.call(this.controller, serve);
+        if (serve.sended) break;
+      }
+      return serve;
     } catch (e) {
-      return (await this.controller.onError(serve, e)).send();
+      try {
+        console.log(e);
+        return (await this.controller.onError(serve, e)).send();
+      } catch (exception) {
+        return serve.reject(exception);
+      }
     }
   }
 

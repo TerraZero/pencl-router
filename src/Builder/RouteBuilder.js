@@ -16,9 +16,11 @@ module.exports = class RouteBuilder {
    * @param {import('../Controller/ControllerBase')} controller 
    */
   constructor(controller) {
-    this._namespace = null;
-    this.routes = [];
     this.controller = controller;
+
+    this.routes = [];
+    this._namespace = null;
+    this._middlewares = [];
   }
 
   /**
@@ -30,23 +32,37 @@ module.exports = class RouteBuilder {
 
   /**
    * @param {string} namespace 
+   * @param {import('./Route').serveCallback[]} middlewares
    * 
    * @returns {this}
    */
-  namespace(namespace) {
+  namespace(namespace, ...middlewares) {
     this._namespace = namespace;
+    this._middlewares = middlewares;
     return this;
   }
 
   /**
    * @param {string} name 
    * @param {string} url 
-   * @param {import('./Route').serveCallback[]} serve 
+   * @param {(import('./Route').serveCallback[]|string[]|[import('./Route').serveCallback, number])} serve 
    * 
    * @returns {this}
    */
   create(name, url, ...serve) {
+    for (const middleware of this._middlewares) {
+      serve.unshift(middleware);
+    }
     this.routes.push(new Route(this.controller, name, url, serve, this._namespace));
+    return this;
+  }
+
+  /**
+   * @param {(import('./Route').serveCallback|string|[import('./Route').serveCallback, number])} middleware
+   * @returns {this}
+   */
+  middleware(middleware) {
+    this.current.addMiddleware(middleware);
     return this;
   }
 

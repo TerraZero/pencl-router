@@ -17,6 +17,7 @@ module.exports = class ControllerBase {
    */
   async onPrepare(serve, route) {
     this._serve = serve;
+    this._route = route;
   }
 
   /**

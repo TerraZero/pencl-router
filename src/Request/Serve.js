@@ -1,3 +1,7 @@
+const Querystring = require('querystring');
+const GETBag = require('./GETBag');
+const FORMBag = require('./FORMBag');
+
 module.exports = class Serve {
 
   /**
@@ -9,17 +13,64 @@ module.exports = class Serve {
     this.response = response;
     this.bag = {};
 
-    this._meta = {
-      status: 403,
-      error: {
-        code: 403,
-        message: 'Service unavailable',
-      },
-    };
+    this._meta = {};
     this._data = {};
     this._body = null;
     this._json = null;
+    this._route = null;
+    this._debug = {};
+    this._values = {};
     this.sended = false;
+    this._isDebug = false;
+    this._GET = null;
+    this._FORM = null;
+
+    this.errorServiceUnavailable();
+  }
+
+  /** @returns {import('../Builder/Route')} */
+  get route() {
+    return this._route;
+  }
+
+  /** @returns {GETBag} */
+  get GET() {
+    if (this._GET === null) {
+      this._GET = new GETBag(this.request);
+    }
+    return this._GET;
+  }
+
+
+  /** @returns {FORMBag} */
+  get FORM() {
+    if (this._FORM === null) {
+      this._FORM = new FORMBag(this.request);
+    }
+    return this._FORM;
+  }
+
+  debug() {
+    this._isDebug = true;
+    return this;
+  }
+
+  /**
+   * @param {string} key 
+   * @param {*} value 
+   * @returns {this}
+   */
+  set(key, value) {
+    this._values[key] = value;
+    return this;
+  }
+
+  /**
+   * @param {string} key 
+   * @returns {*}
+   */
+  get(key) {
+    return this._values[key];
   }
 
   url() {
@@ -35,6 +86,21 @@ module.exports = class Serve {
       delete this._meta.error;
     }
     return this;
+  }
+
+  metaDebug(name, value, isArray = true) {
+    if (this._isDebug) { console.debug('[DEBUG::SERVE] ' + name + ' = ' + JSON.stringify(value)) };
+    if (isArray) {
+      this._debug[name] = this._debug[name] || [];
+      this._debug[name].push(value);
+    } else {
+      this._debug[name] = value;
+    }
+    return this;
+  }
+
+  metaMiddleware(middleware) {
+    return this.metaDebug('middlewares', middleware, true);
   }
 
   json(data) {
@@ -61,24 +127,36 @@ module.exports = class Serve {
    * @returns {this}
    */
   error(code, message) {
+    this._meta = {};
     this.meta('status', code);
     this.meta('error', {code, message});
     return this;
+  }
+
+  errorForbidden() {
+    return this.error(403, 'Forbidden');
   }
 
   errorNotFound() {
     return this.error(404, 'Not found');
   }
 
+  errorServiceUnavailable() {
+    return this.error(503, 'Service unavailable');
+  }
+
   send() {
     this.sended = true;
     return new Promise((resolve, reject) => {
       this.response.setHeader('Content-Type', 'application/json');
-      this.response.end(JSON.stringify({content: this._data, meta: this._meta}), (error) => {
+      const sending = {content: this._data, meta: this._meta};
+
+      if (this._isDebug) sending.debug = this._debug;
+      this.response.end(JSON.stringify(sending), (error) => {
         if (error) {
           reject(error);
         } else {
-          resolve();
+          resolve(this);
         }
       });
     });
@@ -116,6 +194,13 @@ module.exports = class Serve {
     } else {
       return Promise.resolve(this._body);
     }
+  }
+
+  /**
+   * @returns {Promise<object>}
+   */
+  async getFormData() {
+    return Querystring.parse(await this.getBody());
   }
 
   /** @returns {Promise<object>} */
