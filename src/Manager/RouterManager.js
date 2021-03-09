@@ -2,9 +2,12 @@ const RouteBuilder = require('../Builder/RouteBuilder');
 
 module.exports = class RouterManager {
 
-  constructor() {
+  /**
+   * @param {import('../../index')} plugin 
+   */
+  constructor(plugin) {
+    this.plugin = plugin;
     this.controllers = [];
-    this.debugmode = false;
 
     this._routes = null;
     this._middleware = {};
@@ -15,11 +18,6 @@ module.exports = class RouterManager {
    */
   get routes() {
     return this._routes;
-  }
-
-  setDebugMode(mode = true) {
-    this.debugmode = mode;
-    return this;
   }
 
   /**
@@ -56,7 +54,7 @@ module.exports = class RouterManager {
         serve.setBag(bag);
         serve.meta('request', {url, bag});
         serve._route = route;
-        if (this.debugmode) serve.debug();
+        if (this.plugin.debug) serve.debug();
         try {
           serve = await route.serve(this, serve);
           if (!serve.sended) return serve.send();
