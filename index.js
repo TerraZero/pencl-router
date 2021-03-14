@@ -3,11 +3,11 @@ const RouterManager = require('./src/Manager/RouterManager');
 
 class PenclRouter extends PenclPlugin {
 
-  static get name() {
+  get name() {
     return 'router';
   }
 
-  static get config() {
+  get config() {
     return {
       hallo: 'ok',
     };
