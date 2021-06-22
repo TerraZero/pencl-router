@@ -12,7 +12,6 @@
     "@types/node": "^14.14.31",
     "formidable": "^1.2.2",
     "pencl-base": "git+https://github.com/TerraZero/pencl-base.git",
-    "pencl-config": "git+https://github.com/TerraZero/pencl-config.git",
     "route-parser": "0.0.5"
   }
 }
