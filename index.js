@@ -1,4 +1,4 @@
-const PenclPlugin = require('pencl-base/src/Boot/PenclPlugin');
+const PenclPlugin = require('pencl-core/src/Boot/PenclPlugin');
 const RouterManager = require('./src/Manager/RouterManager');
 
 class PenclRouter extends PenclPlugin {
@@ -8,9 +8,7 @@ class PenclRouter extends PenclPlugin {
   }
 
   get config() {
-    return {
-      hallo: 'ok',
-    };
+    return {};
   }
 
   constructor() {

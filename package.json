@@ -11,7 +11,10 @@
   "dependencies": {
     "@types/node": "^14.14.31",
     "formidable": "^1.2.2",
-    "pencl-base": "git+https://github.com/TerraZero/pencl-base.git",
     "route-parser": "0.0.5"
+  },
+  "peerDependencies": {
+    "pencl-core": "git+https://github.com/TerraZero/pencl-core.git",
+    "pencl-kit": "git+https://github.com/TerraZero/pencl-kit.git"
   }
 }

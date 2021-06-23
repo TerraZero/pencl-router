@@ -1,4 +1,4 @@
-const Boot = require('pencl-base');
+const Boot = require('pencl-core');
 
 Boot(__dirname);
 
