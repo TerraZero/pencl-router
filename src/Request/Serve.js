@@ -1,7 +1,6 @@
 const Querystring = require('querystring');
 const GETBag = require('./GETBag');
 const FORMBag = require('./FORMBag');
-const Router = require('../../index');
 
 module.exports = class Serve {
 
@@ -90,7 +89,6 @@ module.exports = class Serve {
   }
 
   metaDebug(name, value, isArray = true) {
-    if (this._isDebug) Router.log(name + ' = ' +  JSON.stringify(value), {}, Router.LOG_DEBUG);
     if (isArray) {
       this._debug[name] = this._debug[name] || [];
       this._debug[name].push(value);
