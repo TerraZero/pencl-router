@@ -1,28 +1,11 @@
-const PenclPlugin = require('pencl-core/src/Boot/PenclPlugin');
-const RouterManager = require('./src/Manager/RouterManager');
+const PenclRouter = require('./src/PenclRouter');
 
-class PenclRouter extends PenclPlugin {
-
-  get name() {
-    return 'router';
+/**
+ * @returns {PenclRouter}
+ */
+module.exports = function() {
+  if (this._pencl_router === undefined) {
+    this._pencl_router = new PenclRouter();
   }
-
-  get config() {
-    return {};
-  }
-
-  constructor() {
-    super();
-    this._manager = null;
-  }
-
-  get manager() {
-    if (this._manager === null) {
-      this._manager = new RouterManager(this);
-    }
-    return this._manager;
-  }
-
+  return this._pencl_router;
 }
-
-module.exports = new PenclRouter();
