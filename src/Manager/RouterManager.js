@@ -54,7 +54,6 @@ module.exports = class RouterManager {
         serve.setBag(bag);
         serve.meta('request', {url, bag});
         serve._route = route;
-        if (this.plugin.debug) serve.debug();
         try {
           serve = await route.serve(this, serve);
           if (!serve.sended) return serve.send();
