@@ -1,5 +1,5 @@
 const PenclPlugin = require('pencl-core/src/Boot/PenclPlugin');
-const RouterManager = require('./src/Manager/RouterManager');
+const RouterManager = require('./Manager/RouterManager');
 
 module.exports = class PenclRouter extends PenclPlugin {
 
@@ -16,6 +16,7 @@ module.exports = class PenclRouter extends PenclPlugin {
     this._manager = null;
   }
 
+  /** @returns {RouterManager} */
   get manager() {
     if (this._manager === null) {
       this._manager = new RouterManager(this);
