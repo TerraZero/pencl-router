@@ -1,21 +1,19 @@
-const Boot = require('pencl-core');
+const Core = require('pencl-core');
 
-Boot(__dirname);
+Core().booting(__dirname);
 
 const http = require('http');
-const router = require('../index');
+const Router = require('../index')();
 const Serve = require('../src/Request/Serve');
 const TestController = require('./TestController');
 
 const host = 'localhost';
 const port = 8000;
 
-router.manager.addController(new TestController());
-router.manager.addMiddleware('test/default', TestController.defaultMiddleware, true);
-router.manager.addMiddleware('test/router', TestController.routerMiddleware);
+Router.manager.addController(new TestController());
 
 const requestListener = function (req, res) {
-  router.manager.serve(new Serve(req, res));
+  Router.manager.serve(new Serve(req, res));
 };
 
 const server = http.createServer(requestListener);

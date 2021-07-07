@@ -1,16 +1,19 @@
 const Formidable = require('formidable');
 const FS = require('fs');
+const RequestBagBase = require('./RequestBagBase');
+const Reflection = require('pencl-kit/src/Util/Reflection');
+const PenclBadParameterError = require('pencl-kit/src/Error/Runtime/PenclBadParameterError');
 
-module.exports = class FORMBag {
+module.exports = class FORMBag extends RequestBagBase {
 
   /**
    * @param {import('http').ClientRequest} request 
    */
   constructor(request) {
-    this.request = request;
+    super(request);
     this._fields = undefined;
     this._files = undefined;
-    this._error = undefined; 
+    this._error = undefined;
   }
 
   async parse() {
@@ -21,7 +24,7 @@ module.exports = class FORMBag {
         this._error = err || null;
         if (err) return resolve();
 
-        this._fields = fields || null; 
+        this._fields = fields || null;
         this._files = files || null;
         resolve();
       });
@@ -82,6 +85,59 @@ module.exports = class FORMBag {
         resolve();
       });
     });
+  }
+
+  /**
+   * @returns {string[]}
+   */
+  async getFields() {
+    const fields = [];
+    for (const field in await this.fields()) {
+      fields.push(field);
+    }
+    return fields;
+  }
+
+  /**
+   * @param {string} field 
+   * @param {*} fallback
+   * @returns {*}
+   */
+  async getRaw(field, fallback = null) {
+    const fields = await this.fields();
+
+    return fields[field] === undefined ? fallback : fields[field];
+  }
+
+  /**
+   * @param {string} field 
+   * @param {*} fallback 
+   * @returns {*}
+   */
+  async getValue(field, fallback = null) {
+    if (this._formatted_values[field] !== undefined) return this._formatted_values[field];
+    this._formatted_values[field] = Reflection.parseValue(await this.getRaw(field, fallback));
+    return this._formatted_values[field];
+  }
+
+  /**
+   * @param {string} field 
+   * @param {*} fallback
+   * @returns {*}
+   */
+  async getField(field, fallback = null) {
+    if (field.indexOf('.') !== -1) throw new PenclBadParameterError(this, 'getField', 'field', 'Invalid parameter <parameter>, please use only root fields: ');
+    if (Reflection.hasDeep(this._merged_fields, field)) return Reflection.getDeep(this._merged_fields, field, fallback);
+    const value = {};
+    const fields = (await this.getFields()).filter(v => v.startsWith(field));
+    fields.sort((a, b) => {
+      return a.length - b.length;
+    });
+    for (const name of fields) {
+      Reflection.setDeep(value, name, await this.getValue(name));
+    }
+    this._merged_fields[field] = value[field];
+    return Reflection.getDeep(this._merged_fields, field, fallback);
   }
 
 }
