@@ -2,7 +2,6 @@ const Formidable = require('formidable');
 const FS = require('fs');
 const RequestBagBase = require('./RequestBagBase');
 const Reflection = require('pencl-kit/src/Util/Reflection');
-const PenclBadParameterError = require('pencl-kit/src/Error/Runtime/PenclBadParameterError');
 
 module.exports = class FORMBag extends RequestBagBase {
 
@@ -126,8 +125,11 @@ module.exports = class FORMBag extends RequestBagBase {
    * @returns {*}
    */
   async getField(field, fallback = null) {
-    if (field.indexOf('.') !== -1) throw new PenclBadParameterError(this, 'getField', 'field', 'Invalid parameter <parameter>, please use only root fields: ');
-    if (Reflection.hasDeep(this._merged_fields, field)) return Reflection.getDeep(this._merged_fields, field, fallback);
+    let deep = [];
+    [field, ...deep] = field.split('.');
+    const fullkey = field + (deep.length ? '.' + deep.join('.') : '');
+
+    if (Reflection.hasDeep(this._merged_fields, fullkey)) return Reflection.getDeep(this._merged_fields, fullkey, fallback);
     const value = {};
     const fields = (await this.getFields()).filter(v => v.startsWith(field));
     fields.sort((a, b) => {
@@ -137,7 +139,7 @@ module.exports = class FORMBag extends RequestBagBase {
       Reflection.setDeep(value, name, await this.getValue(name));
     }
     this._merged_fields[field] = value[field];
-    return Reflection.getDeep(this._merged_fields, field, fallback);
+    return Reflection.getDeep(this._merged_fields, fullkey, fallback);
   }
 
 }

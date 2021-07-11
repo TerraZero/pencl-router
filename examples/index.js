@@ -5,12 +5,12 @@ Core().booting(__dirname);
 const http = require('http');
 const Router = require('../index')();
 const Serve = require('../src/Request/Serve');
-const TestController = require('./TestController');
+
 
 const host = 'localhost';
 const port = 8000;
 
-Router.manager.addController(new TestController());
+Router.manager.load('Controller/**/*Controller.js', __dirname);
 
 const requestListener = function (req, res) {
   Router.manager.serve(new Serve(req, res));

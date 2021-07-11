@@ -1,4 +1,6 @@
 const RouteBuilder = require('../Builder/RouteBuilder');
+const Core = require('pencl-core');
+const Glob = require('glob');
 
 module.exports = class RouterManager {
 
@@ -21,9 +23,27 @@ module.exports = class RouterManager {
   }
 
   /**
+   * @param {string} pattern 
+   * @param {string} cwd 
+   * @param {object} options
+   */
+  load(pattern, cwd, options = {}) {
+    options.cwd = Core().boot.getPath(cwd);
+    options.absolute = true;
+
+    for (const file of Glob.sync(pattern, options)) {
+      const controller = new (require(file))();
+
+      controller.onLoad(this);
+      this.addController(controller);
+    }
+  }
+
+  /**
    * @param {import('../Controller/ControllerBase')} controller 
    */
   addController(controller) {
+    controller.setPlugin(this.plugin);
     this.controllers.push(controller);
     if (this._routes === null) this._routes = [];
     const builder = new RouteBuilder(controller);
@@ -38,6 +58,35 @@ module.exports = class RouterManager {
   addMiddleware(name, func, isDefault = false, sort = -100) {
     this._middleware[name] = {func, isDefault, name, sort};
     return this;
+  }
+
+  /**
+   * @param {string} namespace 
+   * @param {string} name 
+   * @returns {import('../Builder/Route')}
+   */
+  getRoute(namespace, name) {
+    for (const route of this.routes) {
+      if (route.namespace === namespace && route.name === name) {
+        return route;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param {string} namespace 
+   * @returns {import('../Builder/Route')[]}
+   */
+  getRoutes(namespace) {
+    const routes = [];
+
+    for (const route of this.routes) {
+      if (route.namespace === namespace) {
+        routes.push(route);
+      }
+    }
+    return routes;
   }
 
   /**

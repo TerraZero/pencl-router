@@ -1,6 +1,7 @@
 module.exports = class ControllerBase {
 
   constructor() {
+    this.plugin = null;
     this._serve = null;
   }
 
@@ -9,6 +10,15 @@ module.exports = class ControllerBase {
    */
   get serve() {
     return this._serve;
+  }
+
+  /**
+   * @param {import('../PenclRouter')} plugin 
+   * @returns {this}
+   */
+  setPlugin(plugin) {
+    this.plugin = plugin;
+    return this;
   }
 
   /**
@@ -29,6 +39,11 @@ module.exports = class ControllerBase {
   async onError(serve, error) {
     return serve.reject(error);
   }
+
+  /**
+   * @param {import('../Manager/RouterManager')} manager 
+   */
+  onLoad(manager) {}
 
   /**
    * @param {import('../Builder/RouteBuilder')} builder

@@ -69,6 +69,16 @@ module.exports = class Route {
   }
 
   /**
+   * @param {Object<string, (string|int)>} params 
+   * @returns {string}
+   */
+  toUrl(params) {
+    const url = this.pattern.reverse(params);
+    if (url === false) throw new RouterError('The route parameters are not complete.');
+    return url;
+  }
+
+  /**
    * @param {checkCallback} cb 
    * 
    * @returns {this}
