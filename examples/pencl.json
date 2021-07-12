@@ -1,1 +1,8 @@
-{}
+{
+  "router": {
+    "debug": true,
+    "load": [
+      "Controller/**/*Controller.js"
+    ]
+  }
+}

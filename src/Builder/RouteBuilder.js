@@ -78,13 +78,13 @@ module.exports = class RouteBuilder {
 
   checkGET() {
     return this.check((serve) => {
-      return serve.isGET();
+      return serve.isGET;
     });
   }
 
   checkPOST() {
     return this.check((serve) => {
-      return serve.isPOST();
+      return serve.isPOST;
     });
   }
 

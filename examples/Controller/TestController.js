@@ -15,6 +15,8 @@ module.exports = class TestController extends ControllerBase {
    * @param {import('../../src/Request/Serve')} serve 
    */
   all(serve) {
+    serve.bag.line = serve.bag.line || [];
+    serve.bag.line.push('all');
     serve.bag.all = true;
     return serve;
   }
@@ -23,6 +25,8 @@ module.exports = class TestController extends ControllerBase {
    * @param {import('../../src/Request/Serve')} serve 
    */
   mid(serve) {
+    serve.bag.line = serve.bag.line || [];
+    serve.bag.line.push('mid');
     serve.bag.mid = true;
     return serve;
   }
@@ -31,6 +35,8 @@ module.exports = class TestController extends ControllerBase {
    * @param {import('../../src/Request/Serve')} serve 
    */
   async pre(serve) {
+    serve.bag.line = serve.bag.line || [];
+    serve.bag.line.push('pre');
     const data = await serve.FORM.getField('pre');
     if (data === 1) {
       return serve.json({pre: true}).send();
@@ -56,7 +62,7 @@ module.exports = class TestController extends ControllerBase {
       test: await serve.FORM.getField('fields'),
       trim: await serve.FORM.getField('fields.text.trim'),
       bag: serve.bag,
-    }).send();
+    });
   }
 
   /**

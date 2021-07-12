@@ -1,4 +1,5 @@
 const RouteParser = require('route-parser');
+const RouterCodeError = require('../Error/RouterCodeError');
 const RouterError = require('../Error/RouterError');
 
 /**
@@ -41,7 +42,7 @@ module.exports = class Route {
    * @returns {this}
    */
   addMiddleware(middleware) {
-    if (this._prepared) throw new RouterError('The route is already prepared it can not add a middleware.');
+    if (this._prepared) throw new RouterCodeError(501, 'The route is already prepared it can not add a middleware.');
     this._serve.push(middleware);
     return this;
   }
@@ -52,9 +53,9 @@ module.exports = class Route {
    * 
    * @returns {boolean}
    */
-  testCheck(serve, bag) {
+  async testCheck(serve, bag) {
     for (const check of this._checks) {
-      if (check.call(this.controller, serve, bag) === false) return false;
+      if (await check.call(this.controller, serve, bag) === false) return false;
     }
     return true;
   }
@@ -109,7 +110,6 @@ module.exports = class Route {
       return serve;
     } catch (e) {
       try {
-        console.log(e);
         return (await this.controller.onError(serve, e)).send();
       } catch (exception) {
         return serve.reject(exception);

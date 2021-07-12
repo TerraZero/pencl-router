@@ -5,7 +5,7 @@ const Glob = require('glob');
 module.exports = class RouterManager {
 
   /**
-   * @param {import('../../index')} plugin 
+   * @param {import('../PenclRouter')} plugin 
    */
   constructor(plugin) {
     this.plugin = plugin;
@@ -13,6 +13,15 @@ module.exports = class RouterManager {
 
     this._routes = null;
     this._middleware = {};
+
+    const core = Core().boot;
+    for (const pattern of this.plugin.config.load) {
+      if (typeof pattern === 'string') {
+        this.load(pattern, core.root);
+      } else {
+        this.load(pattern.pattern, pattern.cwd ? core.getPath(pattern.cwd) : core.root, pattern.options || {});
+      }
+    }
   }
 
   /**
@@ -94,14 +103,15 @@ module.exports = class RouterManager {
    * @returns {import('../Request/Serve')}
    */
   async serve(serve) {
+    if (this.plugin.config.debug) serve.setDebug(true);
     const url = serve.url();
 
     for (const route of this.routes) {
       const bag = route.match(url);
 
-      if (bag && route.testCheck(serve, bag)) {
+      if (bag && await route.testCheck(serve, bag)) {
         serve.setBag(bag);
-        serve.meta('request', {url, bag});
+        if (this.plugin.config.debug) serve.debug('request', {url, bag});
         serve._route = route;
         try {
           serve = await route.serve(this, serve);
@@ -112,7 +122,7 @@ module.exports = class RouterManager {
         }
       }
     }
-    return serve.errorNotFound().send();
+    return serve.responses.errorNotFound().send();
   }
 
   /**

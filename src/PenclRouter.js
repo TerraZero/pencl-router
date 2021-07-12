@@ -8,7 +8,10 @@ module.exports = class PenclRouter extends PenclPlugin {
   }
 
   get config() {
-    return {};
+    return {
+      debug: false,
+      load: [],
+    };
   }
 
   constructor() {
