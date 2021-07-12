@@ -50,6 +50,7 @@ module.exports = class RouterManager {
 
   /**
    * @param {import('../Controller/ControllerBase')} controller 
+   * @returns {this}
    */
   addController(controller) {
     controller.setPlugin(this.plugin);
@@ -64,6 +65,13 @@ module.exports = class RouterManager {
     return this;
   }
 
+  /**
+   * @param {string} name 
+   * @param {Function} func 
+   * @param {boolean} isDefault 
+   * @param {int} sort 
+   * @returns {this}
+   */
   addMiddleware(name, func, isDefault = false, sort = -100) {
     this._middleware[name] = {func, isDefault, name, sort};
     return this;
