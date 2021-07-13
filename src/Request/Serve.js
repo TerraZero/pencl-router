@@ -1,8 +1,8 @@
 const GETBag = require('./GETBag');
 const FORMBag = require('./FORMBag');
 const ResponseCollection = require('./ResponseCollection');
-const RouterError = require('../Error/RouterError');
 const RouterCodeError = require('../Error/RouterCodeError');
+const PenclError = require('pencl-kit/src/Error/PenclError');
 
 module.exports = class Serve {
 
@@ -147,7 +147,7 @@ module.exports = class Serve {
         this._meta = {};
         this._data = {};
       }
-      if (error instanceof RouterError) {
+      if (error instanceof PenclError) {
         this.responses.errorInternalServerError(error.message);
       } else {
         this.responses.errorInternalServerError();
