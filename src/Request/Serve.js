@@ -13,7 +13,6 @@ module.exports = class Serve {
   constructor(request, response) {
     this.request = request;
     this.response = response;
-    this.bag = {};
 
     this._meta = {};
     this._data = {};
@@ -25,6 +24,7 @@ module.exports = class Serve {
     this.sended = false;
     this._GET = null;
     this._FORM = null;
+    this._BAG = null;
     this._responses = null;
   }
 
@@ -54,6 +54,11 @@ module.exports = class Serve {
       this._FORM = new FORMBag(this.request);
     }
     return this._FORM;
+  }
+
+  /** @returns {Object<string, (string|int)>} */
+  get BAG() {
+    return this._BAG;
   }
 
   /** @returns {boolean} */
@@ -187,8 +192,8 @@ module.exports = class Serve {
     });
   }
 
-  setBag(bag) {
-    this.bag = bag;
+  setBag(bag = {}) {
+    this._BAG = bag;
     return this;
   }
 
