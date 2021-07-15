@@ -30,10 +30,15 @@ module.exports = class Route {
     this._serve = serve;
 
     this._checks = [];
+    this.pattern = new RouteParser(this.real);
+  }
+
+  /** @returns {string} */
+  get real() {
     if (this.namespace === null) {
-      this.pattern = new RouteParser('/' + this.url);
+      return '/' + this.url;
     } else {
-      this.pattern = new RouteParser('/' + this.namespace + '/' + this.url);
+      return '/' + this.namespace + '/' + this.url;
     }
   }
 
