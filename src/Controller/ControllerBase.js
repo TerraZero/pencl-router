@@ -1,8 +1,11 @@
+const RouteBuilder = require('../Builder/RouteBuilder');
+
 module.exports = class ControllerBase {
 
   constructor() {
     this.plugin = null;
     this._serve = null;
+    this._routes = null;
   }
 
   /**
@@ -10,6 +13,17 @@ module.exports = class ControllerBase {
    */
   get serve() {
     return this._serve;
+  }
+
+  /** @returns {import('../Builder/Route')[]} */
+  get routes() {
+    if (this._routes === null) {
+      const builder = new RouteBuilder(this);
+
+      this.initRoutes(builder);
+      this._routes = builder.routes;
+    }
+    return this._routes;
   }
 
   /**

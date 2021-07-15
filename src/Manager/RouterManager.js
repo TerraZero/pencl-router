@@ -55,11 +55,9 @@ module.exports = class RouterManager {
   addController(controller) {
     controller.setPlugin(this.plugin);
     this.controllers.push(controller);
+    
     if (this._routes === null) this._routes = [];
-    const builder = new RouteBuilder(controller);
-
-    controller.initRoutes(builder);
-    for (const route of builder.routes) {
+    for (const route of controller.routes) {
       this._routes.push(route);
     }
     return this;
