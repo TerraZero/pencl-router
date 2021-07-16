@@ -26,6 +26,7 @@ module.exports = class Route {
     this.name = name;
     this.namespace = namespace;
     this.url = url;
+    this.info = {};
     this._prepared = false;
     this._serve = serve;
 
@@ -63,6 +64,16 @@ module.exports = class Route {
       if (await check.call(this.controller, serve, bag) === false) return false;
     }
     return true;
+  }
+
+  /**
+   * @param {string} key 
+   * @param {*} value 
+   * @returns {this}
+   */
+  setInfo(key, value) {
+    this.info[key] = value;
+    return this;
   }
 
   /** 

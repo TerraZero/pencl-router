@@ -77,12 +77,14 @@ module.exports = class RouteBuilder {
   }
 
   checkGET() {
+    this.current.setInfo('type', 'get');
     return this.check((serve) => {
       return serve.isGET;
     });
   }
 
   checkPOST() {
+    this.current.setInfo('type', 'post');
     return this.check((serve) => {
       return serve.isPOST;
     });
@@ -94,6 +96,7 @@ module.exports = class RouteBuilder {
    * @returns {this}
    */
   checkRequired(fields) {
+    this.current.setInfo('required', fields);
     return this.check((serve, bag) => {
       for (const field of fields) {
         if (!Reflection.hasDeep(bag, field)) return false;
@@ -106,6 +109,11 @@ module.exports = class RouteBuilder {
    * @param {Object.<string, checkFieldCallback>} fields
    */
   checkField(fields) {
+    const info = [];
+    for (const field in fields) {
+      info.push(field);
+    }
+    this.current.setInfo('condition_fields', info);
     return this.check(function(serve, bag) {
       for (const field in fields) {
         if (!fields[field].call(this, Reflection.getDeep(bag, field, undefined), serve, bag, field)) return false;
