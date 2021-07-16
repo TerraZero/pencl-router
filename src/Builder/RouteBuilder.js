@@ -122,4 +122,14 @@ module.exports = class RouteBuilder {
     });
   }
 
+  /**
+   * @param {string} key 
+   * @param {*} value 
+   * @returns {this}
+   */
+  info(key, value) {
+    this.current.setInfo(key, value);
+    return this;
+  }
+
 }
