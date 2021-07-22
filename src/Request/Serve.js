@@ -104,6 +104,26 @@ module.exports = class Serve {
     return this.request.url;
   }
 
+  /**
+   * @typedef {Object} T_cachedata
+   * @property {string[]} key
+   * @property {string[]} clear
+   */
+
+  /**
+   * @param {T_cachedata} cachedata 
+   * @returns {this}
+   */
+  cache(cachedata) {
+    this.meta('cache', cachedata);
+    return this;
+  }
+
+  /**
+   * @param {string} key 
+   * @param {any} value 
+   * @returns {this}
+   */
   meta(key, value) {
     this._meta[key] = value;
     if (key === 'status') {

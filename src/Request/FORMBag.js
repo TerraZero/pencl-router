@@ -15,8 +15,6 @@ module.exports = class FORMBag extends RequestBagBase {
     this._error = undefined;
   }
 
-  async 
-
   async parse() {
     const form = Formidable({multiples: true});
 
