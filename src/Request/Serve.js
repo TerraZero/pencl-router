@@ -140,6 +140,7 @@ module.exports = class Serve {
    */
   addMeta(key, value) {
     if (this._meta[key] !== undefined && !Array.isArray(this._meta[key])) throw new PenclBadParameterError(this, 'addMeta', 'key', 'The key is already in use and ist not an array. Please use meta() to set the value.');
+    if (this._meta[key] === undefined) this._meta[key] = [];
     this._meta[key].push(value);
     return this;
   }
