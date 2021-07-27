@@ -3,6 +3,7 @@ const FORMBag = require('./FORMBag');
 const ResponseCollection = require('./ResponseCollection');
 const RouterCodeError = require('../Error/RouterCodeError');
 const PenclError = require('pencl-kit/src/Error/PenclError');
+const PenclBadParameterError = require('pencl-kit/src/Error/Runtime/PenclBadParameterError');
 
 module.exports = class Serve {
 
@@ -129,6 +130,17 @@ module.exports = class Serve {
     if (key === 'status') {
       delete this._meta.error;
     }
+    return this;
+  }
+
+  /**
+   * @param {string} key 
+   * @param {any} value 
+   * @returns {this}
+   */
+  addMeta(key, value) {
+    if (this._meta[key] !== undefined && !Array.isArray(this._meta[key])) throw new PenclBadParameterError(this, 'addMeta', 'key', 'The key is already in use and ist not an array. Please use meta() to set the value.');
+    this._meta[key].push(value);
     return this;
   }
 
